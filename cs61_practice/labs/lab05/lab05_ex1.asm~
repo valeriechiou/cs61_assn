@@ -1,0 +1,113 @@
+;=================================================
+; Name: Chiou, Valerie
+; Username: vchio001
+; 
+; Lab: lab 04
+; Lab section: 22
+; TA: Bryan Marsh
+; 
+;=================================================
+.orig x3000
+
+;----------
+;instructions
+;-----------
+LD R1, ADDRSS
+LD R2, CNT_10
+LD R3, ONE
+
+INCREMENT
+STR R3, R1, #0  ;puts R3(ONE) into x4000. 2^0
+ADD R1, R1, #1	;increase array
+ADD R3, R3, R3	;add to self to get next
+ADD R2, R2, #-1 
+BRp INCREMENT
+
+LD R6, SUBROUTINE
+JSRR R6 	;loading subroutine
+		;(OR) JSR, SUBROUTINE: No data-label, but need to put label in subroutine section
+
+HALT
+
+;----
+;data
+;----
+ONE 	.FILL	x1
+ZERO	.FILL	#0
+SPACE   .FILL   x20
+CNT_10	.FILL	#10
+CNT16   .FILL   #16
+CNT4    .FILL   #4
+SUBROUTINE	.FILL	x3200	;fill w/address you put subroutine at
+ADDRSS	.FILL	x4000
+.orig x4000
+
+ARRAY	.BLKW	#10
+
+;=================================================
+	.orig x3200
+;1: backup R7 & any registers that the subroutine changes except Return Values
+	ST R7, BACKUP_R7_3200
+;2: Subroutine Algorithm
+	LD R1, ADDRS
+	LD R2, CNT10
+
+FOR
+	LDR R4, R1, #0
+	ADD R1, R1, #1
+
+	LD R6, CNT_16
+	LD R3, CNT_4
+
+CHECK
+	ADD R4, R4, #0
+	BRn NEG
+	BRzp POS
+
+POS            		 ;MSD is 0 (positive)
+	LD R0, ZERO0
+	OUT 
+	ADD R4, R4, R4
+	ADD R6, R6, #-1
+	BRp AFTER_OUTPUT
+	BRz LINE
+
+NEG         		    ;MSD is 1 (zero)
+	LD R0, ONE1
+	OUT 
+	ADD R4, R4, R4
+	ADD R6, R6, #-1
+	BRp AFTER_OUTPUT
+	BRz LINE
+	
+AFTER_OUTPUT	ADD R3, R3, #-1 ;decrement 4 place counter
+
+BRp CHECK	BRz SPACE_OUTPUT
+
+SPACE_OUTPUT
+		LD R0, SPACE    ;output a space after 4 digits 
+		OUT
+		ADD R3, R3, #4
+		BRp CHECK
+
+LINE
+		LD R0, CNT10
+		OUT
+		ADD R4, R4, #-1
+		BRp FOR
+;3: restore registers
+	LD R7, BACKUP_R7_3200
+;4: 
+	RET
+;====
+;data
+;====
+BACKUP_R7_3200	.BLKW	#1
+ZERO0	.FILL	#0
+SPACE	.STRINGZ	" "
+ONE1	.FILL	#1
+ADDRS	.FILL	x4000
+CNT_4	.FILL	#4
+CNT10	.FILL	#10
+CNT_16	.FILL	#16
+

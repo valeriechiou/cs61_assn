@@ -1,0 +1,583 @@
+;=================================================
+; Name: Valerie Chiou
+; Email: vchio001@ucr.edu
+; 
+; Assignment name: assn 5
+; Lab section: 22
+; TA: Jhaveri
+; 
+; I hereby certify that I have not received assistance on this assignment,
+; or used code, from ANY outside source other than the instruction team.
+;
+;=================================================
+
+.ORIG x3000	
+;-------------
+;Instructions
+;-------------
+LD R0, GET_INPUT_PTR
+JSRR R0
+
+ADD R6, R2, #0			; 1ST NUM
+LD R0, OUTPUT_NUMBER_PTR
+JSRR R0
+
+
+LEA R0, TIMES			; * SIGN
+PUTS
+
+ADD R6, R1, #0			
+
+LD R0, OUTPUT_NUMBER_PTR	; 2ND NUM
+JSRR R0
+
+LD R0, ORDER_DESCEND_PTR
+JSRR R0
+
+
+LD R0, SUB_MULTIPLICATION_PTR
+JSRR R0
+
+ADD R4, R4, #0
+BRnp END_PROGRAM
+
+LEA R0, EQUALS 			; =
+PUTS
+
+LD R0, OUTPUT_NUMBER_PTR	; RESULT
+JSRR R0
+
+LD R0, NEWLINE_MAIN		; \n
+OUT
+
+END_PROGRAM			; HOOOOLY SHIT I'M DONEEEEEEEEEEEEE
+HALT
+
+;---------------	
+;Data
+;---------------
+GET_INPUT_PTR .FILL x3200
+ORDER_DESCEND_PTR .FILL x3600
+SUB_MULTIPLICATION_PTR .FILL x3800
+OUTPUT_NUMBER_PTR .FILL x4200
+
+NEWLINE_MAIN .FILL '\n'
+TIMES .STRINGZ " * "
+EQUALS .STRINGZ " = "
+
+;-------------------
+; Subroutine to get input from user and store value in R1
+;-------------------
+.ORIG x3200
+GET_INPUT
+
+ST R0, R0_BOOKUP_3200
+ST R3, R3_BOOKUP_3200
+ST R4, R4_BOOKUP_3200
+ST R5, R5_BOOKUP_3200
+ST R6, R6_BOOKUP_3200
+ST R7, R7_BOOKUP_3200
+
+; get 1st num
+LD R0, STORE_TO_REG_PTR
+JSRR R0
+
+; store num in R2
+ADD R2, R1, #0
+
+; get 2nd num
+JSRR R0
+
+LD R0, R0_BOOKUP_3200
+LD R3, R3_BOOKUP_3200
+LD R4, R4_BOOKUP_3200
+LD R5, R5_BOOKUP_3200
+LD R6, R6_BOOKUP_3200
+LD R7, R7_BOOKUP_3200
+
+RET
+
+R0_BOOKUP_3200 .BLKW #1
+R3_BOOKUP_3200 .BLKW #1
+R4_BOOKUP_3200 .BLKW #1
+R5_BOOKUP_3200 .BLKW #1
+R6_BOOKUP_3200 .BLKW #1
+R7_BOOKUP_3200 .BLKW #1
+STORE_TO_REG_PTR .FILL x3400
+
+;---------------------------------
+; Subroutine to grab numbers
+;---------------------------------
+.orig x3400
+STORE_TO_REG
+    
+    ST R0, R0_BOOKUP_3400
+    ST R2, R2_BOOKUP_3400
+    ST R3, R3_BOOKUP_3400
+    ST R4, R4_BOOKUP_3400
+    ST R5, R5_BOOKUP_3400
+    ST R6, R6_BOOKUP_3400
+    ST R7, R7_BOOKUP_3400
+
+    BR RESTART
+
+    ERROR
+		LD R0,NEWLINE
+		OUT
+	    LD R0, errorMessage
+	    PUTS
+
+    RESTART
+    LD R0, intoMessage
+    PUTS
+
+    LD R2, PTR
+    LD R5, DEC5
+    LD R3, MINUS
+    GETC
+    OUT
+    
+    NOT R4, R0		    	; check if first char -
+    ADD R4, R4, #1
+    ADD R1, R3, R4
+    BRz NEG_CASE
+    
+    LD R3, PLUS			; check if first char is +
+    ADD R1, R3, R4
+    BRz POS_CASE
+
+    BR CONT
+
+    NEG_CASE
+        LD R6, HAS_MINUS
+        GETC
+        OUT
+        BR STARTLOOP
+    POS_CASE
+        GETC
+        OUT
+        BR STARTLOOP
+    CONT
+        BR STARTLOOP
+
+    WHILELOOP
+        GETC
+    	OUT
+
+        STARTLOOP
+		LD R3, NEWLINE
+		NOT R4, R0
+		ADD R4, R4, #1
+		ADD R1, R4, R3
+		BRz ENTER_CASE
+
+		LD R4, UPPER		; check if number is in range
+		ADD R3, R4, R0
+		BRp ERROR
+
+		LD R4, LOWER
+		ADD R3, R4, R0
+		BRn ERROR
+
+		STR R0, R2, #0
+		ADD R2, R2, #1
+		ADD R5, R5, #-1
+    		
+		BRp WHILELOOP
+
+    ENTER_CASE
+        LD R0, DEC0
+        STR R0, R2, #0
+            
+    LD R5,DEC5
+    LD R2,PTR
+    LD R3,DEC0
+
+
+    LDR R1, R2, #0
+    ADD R2, R2, #1
+    
+    ADD R1, R1, #-12			; ASCII TO DEC 
+    ADD R1, R1, #-12
+    ADD R1, R1, #-12
+    ADD R1, R1, #-12 
+
+    CALCULATION
+        LDR R4, R2, #0
+        ADD R4, R4, #0
+        BRz DONE
+        ADD R2, R2, #1
+
+        ADD R4, R4, #-12		; ASCII TO DEC
+        ADD R4, R4, #-12
+        ADD R4, R4, #-12
+        ADD R4, R4, #-12 
+
+        ADD R1, R1, R1
+        ADD R3, R1, #0
+        ADD R3, R3, R3
+        ADD R3, R3, R3
+        ADD R1, R3, R1
+        ADD R1, R1, R4
+ 
+        BR CALCULATION
+    DONE
+
+    ADD R6, R6, #0
+    BRp CHANGE_TO_NEG
+    BR KEEP_SIGN
+
+    CHANGE_TO_NEG
+        NOT R1, R1;TAKECOMPLIMENT
+        ADD R1, R1, #1;ADDONE
+
+    KEEP_SIGN
+
+    LD R0, R0_BOOKUP_3400
+    LD R2, R2_BOOKUP_3400
+    LD R3, R3_BOOKUP_3400
+    LD R4, R4_BOOKUP_3400
+    LD R5, R5_BOOKUP_3400
+    LD R6, R6_BOOKUP_3400
+    LD R7, R7_BOOKUP_3400
+    RET
+
+
+R0_BOOKUP_3400 .BLKW #1
+R1_BOOKUP_3400 .BLKW #1
+R2_BOOKUP_3400 .BLKW #1
+R3_BOOKUP_3400 .BLKW #1
+R4_BOOKUP_3400 .BLKW #1
+R5_BOOKUP_3400 .BLKW #1
+R6_BOOKUP_3400 .BLKW #1
+R7_BOOKUP_3400 .BLKW #1
+PTR .FILL x4000
+intoMessage .FILL x6000
+errorMessage .FILL x6100
+DEC5 .FILL #5
+DEC0 .FILL #0
+MINUS .FILL '-'
+PLUS .FILL '+'
+HAS_MINUS .FILL #1
+NEWLINE .FILL '\n'
+LOWER .FILL -x30
+UPPER .FILL -x39
+
+
+
+.orig x4000
+ARyAY .BLKW #6
+.ORIG x6000
+intro .STRINGZ		"Input a positive or negative decimal number (max 5 digits), followed by ENTER\n"
+.ORIG x6100	
+error_mes .STRINGZ	"ERROR INVALID INPUT\n"
+
+;-----------------------------------
+; THE DESCENDANTS BE SWAPPIN
+;--------------------------WTF------
+.orig x3600
+ORDER_DESCEND
+
+ST R0, R0_BOOKUP_3600
+ST R4, R4_BOOKUP_3600
+ST R5, R5_BOOKUP_3600
+ST R6, R6_BOOKUP_3600
+ST R7, R7_BOOKUP_3600
+
+AND R3, R3, #0
+
+
+ADD R1, R1, #0
+BRn NEG_R1
+BR POS_R1
+
+NEG_R1
+  NOT R1,R1
+  ADD R1,R1,#1
+  ADD R3,R3,#1
+POS_R1
+
+ADD R2, R2, #0
+BRn NEG_R2
+BR POS_R2
+
+NEG_R2
+  NOT R2, R2
+  ADD R3, R3,#-1
+  ADD R2, R2,#1
+POS_R2
+
+
+ADD R5, R2, #0
+NOT R5, R5
+ADD R5, R5, #1
+
+ADD R4, R1, R5
+
+BRn SWAP_EM
+BR KEEP_EM
+
+SWAP_EM
+  ADD R5, R2, #0
+  ADD R2, R1, #0
+  ADD R1, R5, #0
+KEEP_EM
+
+LD R0, R0_BOOKUP_3600
+LD R4, R4_BOOKUP_3600
+LD R5, R5_BOOKUP_3600
+LD R6, R6_BOOKUP_3600
+LD R7, R7_BOOKUP_3600
+
+RET
+
+R0_BOOKUP_3600 .BLKW #1
+R3_BOOKUP_3600 .BLKW #1
+R4_BOOKUP_3600 .BLKW #1
+R5_BOOKUP_3600 .BLKW #1
+R6_BOOKUP_3600 .BLKW #1
+R7_BOOKUP_3600 .BLKW #1
+
+;-------------------
+; Subroutine to multiply two numbers help in Register x and Register y and store result
+; into Register z
+;-------------------
+.orig x3800
+SUB_MULTIPLICATION
+
+ST R0, R0_BOOKUP_3800
+ST R1, R1_BOOKUP_3800
+ST R2, R2_BOOKUP_3800
+ST R3, R3_BOOKUP_3800
+ST R5, R5_BOOKUP_3800
+ST R7, R7_BOOKUP_3800
+
+AND R6, R6, #0
+
+LD R5, MSB
+
+ADD R2, R2, #0
+BRz END_MULT_WHILE
+BR MULT_WHILE
+
+MULT_WHILE
+
+  ADD R6, R1, R6
+  ADD R2, R2, #-1
+
+  AND R4, R5, R6
+  BRnp OVERFLOW
+  ADD R2, R2, #0
+  BRp MULT_WHILE
+END_MULT_WHILE
+
+
+
+ADD R3, R3, #0
+BRz NORMAL
+BR NEGFLAG
+
+NEGFLAG
+    NOT R6, R6
+    ADD R6, R6, #1
+NORMAL
+BR EXIT_NORMAL
+
+
+OVERFLOW
+LEA R0, OVERFLOW_MESSAGE
+PUTS
+
+EXIT_NORMAL
+
+LD R0, R0_BOOKUP_3800
+LD R1, R1_BOOKUP_3800
+LD R2, R2_BOOKUP_3800
+LD R3, R3_BOOKUP_3800
+LD R5, R5_BOOKUP_3800
+LD R7, R7_BOOKUP_3800
+
+RET
+
+R0_BOOKUP_3800 .BLKW #1
+R1_BOOKUP_3800 .BLKW #1
+R2_BOOKUP_3800 .BLKW #1
+R3_BOOKUP_3800 .BLKW #1
+R5_BOOKUP_3800 .BLKW #1
+R7_BOOKUP_3800 .BLKW #1
+MSB .FILL x8000
+OVERFLOW_MESSAGE .STRINGZ " = Overflow!\n"
+
+
+;-------------------
+; Subroutine to ouput number in Register x
+;-------------------
+.orig x4300
+OUTPUT_NUMBER
+
+ST R0, R0_BOOKUP_4200
+ST R1, R1_BOOKUP_4200
+ST R6, R6_BOOKUP_4200
+ST R2, R2_BOOKUP_4200
+ST R3, R3_BOOKUP_4200
+ST R4, R4_BOOKUP_4200
+ST R7, R7_BOOKUP_4200
+
+ADD R6, R6, #0
+BRz CASE_ZERO
+BRn CASE_NEG
+BR CASE_NORM
+
+CASE_ZERO
+    LD R4, CONVERT
+    ADD R0,R6,R4
+    OUT
+    BR SKIP5
+CASE_NEG
+    LD R0, MINUSS_CHAR
+    OUT
+    NOT R6, R6
+    ADD R6, R6, #1
+	BR CONTINUE
+CASE_NORM
+	LD R0, PLUSS_CHAR
+	OUT
+	BR CONTINUE
+
+CONTINUE
+LD R0, DEC10000
+AND R3, R3, #0
+
+AND R1, R1, #0
+
+DECREMENT_10000
+    ADD R2, R6, #0
+    ADD R2, R0, R2
+    BRn DONE10000
+    ADD R3, R3, #1
+    ADD R6, R2, #0
+    BR DECREMENT_10000
+DONE10000
+    LD R4, CONVERT
+    ADD R0,R3,R4
+    LD R5, CONVERT2
+    ADD R5, R0, R5
+    ADD R5, R1, R5
+    BRz SKIP1
+    ADD R1, R1, #1
+    OUT
+SKIP1
+
+LD R0, DEC1000
+AND R3, R3, #0
+DECREMENT_1000
+    ADD R2, R6, #0
+    ADD R2, R0, R2
+    BRn DONE1000
+    ADD R3, R3, #1
+    ADD R6, R2, #0
+    BR DECREMENT_1000
+DONE1000
+    LD R4, CONVERT
+    ADD R0, R3, R4
+    LD R5, CONVERT2
+    ADD R5, R0, R5
+    ADD R5, R1, R5
+    BRz SKIP2 
+    ADD R1, R1, #1
+    OUT
+
+SKIP2
+LD R0, DEC100
+AND R3, R3, #0
+DECR100
+    ADD R2, R6, #0
+    ADD R2, R0, R2
+    BRn DONE100
+    ADD R3, R3, #1
+    ADD R6, R2, #0
+    BR DECR100
+DONE100
+    LD R4, CONVERT
+    ADD R0, R4, R3
+    LD R5, CONVERT2
+    ADD R5, R0, R5
+    ADD R5, R1, R5
+    BRz SKIP3
+    ADD R1, R1, #1
+    OUT
+
+
+SKIP3
+LD R0, DEC10
+AND R3, R3, #0
+DECREMENT_10
+    ADD R2, R6, #0
+    ADD R2, R0, R2
+    BRn DONE10
+    ADD R3, R3, #1
+    ADD R6, R2, #0
+    BR DECREMENT_10
+DONE10
+    LD R4, CONVERT
+    ADD R0, R4, R3
+    LD R5, CONVERT2
+    ADD R5, R0, R5
+    ADD R5, R1, R5
+    BRz SKIP4
+    ADD R1, R1, #1
+    OUT
+
+SKIP4
+LD R0, DEC_1
+AND R3, R3, #0
+DECR_1
+    ADD R2, R6, #0
+    ADD R2, R2, R0
+    BRn DONE_1
+    ADD R3, R3, #1
+    ADD R6, R2, #0
+    BR DECR_1
+DONE_1
+    LD R4, CONVERT
+    ADD R0, R4, R3
+    LD R5, CONVERT2
+    ADD R5, R0, R5
+    ADD R5, R1, R5
+    BRz SKIP5
+    ADD R1, R1, #1
+    OUT
+SKIP5
+
+
+
+LD R0, R0_BOOKUP_4200
+LD R1, R1_BOOKUP_4200
+LD R6, R6_BOOKUP_4200
+LD R2, R2_BOOKUP_4200
+LD R3, R3_BOOKUP_4200
+LD R4, R4_BOOKUP_4200
+LD R7, R7_BOOKUP_4200
+
+RET
+
+
+R0_BOOKUP_4200 .BLKW #1
+R1_BOOKUP_4200 .BLKW #1
+R6_BOOKUP_4200 .BLKW #1
+R2_BOOKUP_4200 .BLKW #1
+R3_BOOKUP_4200 .BLKW #1
+R4_BOOKUP_4200 .BLKW #1
+R7_BOOKUP_4200 .BLKW #1
+
+CONVERT .FILL x30
+CONVERT2 .FILL -x30
+MINUSS_CHAR .FILL '-'
+PLUSS_CHAR .FILL '+'
+DEC10000 .FILL #-10000
+DEC1000 .FILL #-1000
+DEC100 .FILL #-100
+DEC10 .FILL #-10
+DEC_1 .FILL #-1
+
+.END

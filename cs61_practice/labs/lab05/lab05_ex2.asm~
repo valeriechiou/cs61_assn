@@ -1,0 +1,113 @@
+;=================================================
+; Name: Chiou, Valerie
+; Username: vchio001
+; 
+; Lab: lab 04
+; Lab section: 22
+; TA: Bryan Marsh
+; 
+;=================================================
+.orig x3000
+
+;----------
+;instructions
+;-----------
+LD R1, ZERO
+LD R2, CNT16
+LD R3, HEX_30
+
+GETC
+OUT 	;for b
+
+INPUT		GETC
+		OUT
+		ADD R0, R0, R3
+		ADD R1, R1, R1 		;make sure it's zero
+		ADD R1, R1, R0
+		
+		ADD R2, R2, #-1		;reduce counter
+		BRp	INPUT
+LD R0, LINE
+OUT
+
+LD R6, SUBROUTINE
+JSRR R6
+
+
+HALT
+
+;----
+;data
+;----
+ZERO	.FILL	#0
+CNT16	.FILL	x10
+HEX_30	.FILL	-x30
+LINE	.FILL	xA
+SUBROUTINE	.FILL	x3200
+;=================================================
+.orig x3200
+
+	.orig x3200
+;1: backup R7 & any registers that the subroutine changes except Return Values
+	ST R7, BACKUP_R7_3200
+;2: Subroutine Algorithm
+	LD R1, ADDRS
+	LD R2, CNT10
+
+FOR
+	LDR R4, R1, #0
+	ADD R1, R1, #1
+
+	LD R6, CNT16
+	LD R3, CNT4
+
+CHECK
+	ADD R4, R4, #0
+	BRn NEG
+	BRzp POS
+
+POS            		 ;MSD is 0 (positive)
+	LD R0, ZERO
+	OUT 
+	ADD R4, R4, R4
+	ADD R6, R6, #-1
+	BRp AFTER_OUTPUT
+	BRz LINE
+
+NEG         		    ;MSD is 1 (zero)
+	LD R0, ONE
+	OUT 
+	ADD R4, R4, R4
+	ADD R6, R6, #-1
+	BRp AFTER_OUTPUT
+	BRz LINE
+	
+AFTER_OUTPUT	ADD R3, R3, #-1 ;decrement 4 place counter
+
+BRp CHECK	BRz SPACE_OUTPUT
+
+SPACE_OUTPUT
+		LD R0, SPACE    ;output a space after 4 digits 
+		OUT
+		ADD R3, R3, #4
+		BRp CHECK
+
+LINE
+		LD R0, CNT10
+		OUT
+		ADD R4, R4, #-1
+
+;3: restore registers
+	LD R7, BACKUP_R7_3200
+;4: 
+	RET
+;====
+;data
+;====
+BACKUP_R7_3200	.BLKW	#1
+ADDRS	.FILL	x4000
+CNT10	.FILL	#10
+ZERO	.FILL	#0
+ONE	.FILL	#1
+SPACE	.FILL	x20
+

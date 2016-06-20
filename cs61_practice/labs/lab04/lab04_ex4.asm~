@@ -1,0 +1,138 @@
+;=================================================
+; Name: Valerie Chiou
+; Username: vchio001
+; 
+; Assignment name: assn 3
+; Lab section: 21
+; TA: Bryan Marsh
+; 
+; I hereby certify that I have not received assistance on this assignment,
+; or used code, from ANY outside source other than the instruction team.
+;
+;=================================================
+
+.ORIG x3000
+;Instructions
+LD R1, ptr
+LD R3, start
+LD R4, counter
+
+STR R3, R1, #0
+
+WRITE_LOOP
+  ADD R3, R3, R3
+  ADD R1, R1, #1
+  STR R3, R1, #0
+  ADD R4, R4, #-1
+BRp WRITE_LOOP
+
+LD R6, ptr
+LD R2, hex_x8000
+LD R4, size
+LD R5, counter2
+LD R3, counter2
+READ_LOOP
+  LDR R1, R6, #0
+  PRINT_LOOP
+    AND R0, R1, R2
+    
+    BRz PRINT_ZERO
+      LEA R0, NUM_1
+      PUTS
+    BRnp END
+    
+    PRINT_ZERO
+      LEA R0, NUM_0
+      PUTS
+    
+    END
+    ADD R1, R1, R1
+
+    ADD R5, R5, #-1
+    BRp PRINT_LOOP
+  END_PRINT_LOOP
+
+  SPACE_LOOP
+    ADD R5, R5, #4
+    ADD R3, R3, #-1
+    BRz END_LOOP
+    LEA R0, SPACE
+    PUTS
+    BR PRINT_LOOP
+  BRzp SPACE_LOOP
+
+  END_LOOP
+  LEA R0, NEWLINE
+  PUTS
+;LD R3, iterator
+;ADD R3, R3, #1
+;ST R3, iterator
+;LD R1, ptr
+;ADD R1, R1, R3
+ADD R6, R6, #1
+ADD R3, R3, #4
+ADD R4, R4, #-1  
+BRp READ_LOOP
+
+HALT
+
+;Local Data
+ptr .FILL x4000
+counter .FILL #9
+start .FILL #1
+size .FILL #10
+counter2 .FILL #4
+iterator .FILL #0
+
+NUM_0 .STRINGZ "0"
+NUM_1 .STRINGZ "1"
+SPACEE .STRINGZ " "
+NEWLINE .STRINGZ "\n"
+hex_x8000 .FILL x8000
+
+;Remote Data
+.ORIG x4000
+.BLKW #10
+
+.END
+OUT 
+ADD R4, R4, R4
+ADD R6, R6, #-1
+BRp AFTER_OUTPUT
+BRz LINE
+
+AFTER_OUTPUT
+ADD R3, R3, #-1 ;decrement 4 place counter
+
+BRp OUT
+BRz SPACE_OUTPUT
+
+SPACE_OUTPUT
+LD R0, SPACE    ;output a space after 4 digits 
+OUT
+ADD R3, R3, #4
+BRp OUT
+
+LINE
+LD R0, CNT10
+OUT
+ADD R4, R4, #-1
+BRp CHECK
+
+HALT
+
+;----
+;data
+;----
+ONE 	.FILL	x1
+ZERO	.FILL	x30
+SPACE   .FILL   x20
+CNT10	.FILL	#10
+CNT16   .FILL   #16
+CNT4    .FILL   #4
+ADDRS	.FILL	x4000
+.orig x4000
+
+ARRAY	.BLKW	#10
+
+.END

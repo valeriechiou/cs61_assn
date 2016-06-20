@@ -1,0 +1,139 @@
+;=================================================
+; Name: Valerie Chiou
+; Username: vchio001
+; Lab section: 21
+; TA: Bryan Marsh
+; Lab: 7
+;=================================================
+.orig x3000			; Program begins here
+;-------------
+;Instructions
+;-------------
+LD R0, PTR
+JSR SUB_GET_STRING
+LD R0,PTR
+JSR SUB_IS_A_PALINDROME
+HALT
+PTR .FILL x4000
+
+SUB_GET_STRING
+.ORIG x3200
+ST R0, bR0 
+ST R1, bR1 
+ST R2, bR2 
+ST R3, bR3 
+ST R4, bR4 
+ST R5, bR5 
+ST R6, bR6
+ST R7, bR7
+
+LD R1, bR0
+
+
+STRING_FILL
+TRAP x20
+ADD R2,R0,#0
+ADD R2,R2,#-10
+BRz IS_ENTER
+
+STR R0,R1,#0
+ADD R1, R1,#1
+ADD R5,R5,#1
+BR STRING_FILL
+
+
+IS_ENTER
+
+LD R0, NULL
+STR R0,R1,#0
+
+LEA R0, NL
+PUTS
+LD R0, bR0 
+LD R1, bR1 
+LD R3, bR3 
+LD R4, bR4 
+LD R6, bR6
+LD R7, bR7
+RET
+bR0 .BLKW #1
+bR1 .BLKW #1
+bR2 .BLKW #1
+bR3 .BLKW #1
+bR4 .BLKW #1
+bR5 .BLKW #1
+bR6 .BLKW #1
+bR7 .BLKW #1
+ONE .FILL #1
+NL .STRINGZ "\n"
+NULL .FILL #0
+STRING .STRINGZ ""
+
+SUB_IS_A_PALINDROME
+.ORIG x3400
+ST R0, AR0 
+ST R1, AR1 
+ST R2, AR2 
+ST R3, AR3 
+ST R4, AR4 
+ST R5, AR5 
+ST R6, AR6
+ST R7, AR7
+
+LD R1, AR0
+LD R2,AR0
+LD R5, AR5
+ADD R2,R2,R5
+ADD R2,R2,#-1
+
+PALI_LOOP
+LDR R3,R1,#0
+LDR R6,R2,#0
+NOT R6,R6
+ADD R6,R6,#1
+ADD R3,R3,R6
+BRnp NOT_A_PALI
+ADD R1,R1,#1
+ADD R2,R2,#-1
+
+NOT R6,R2
+ADD R6,R6,#1
+ADD R6,R1,R6
+BRz IS_A_PALI
+NOT R6,R2
+ADD R6,R6,#2
+ADD R6,R1,R6
+BRz IS_A_PALI
+BR PALI_LOOP
+
+
+NOT_A_PALI
+	LD R4,NOT_PALI
+	BR DONE
+IS_A_PALI
+	LD R4,IS_PALI
+	BR DONE
+
+
+
+
+DONE
+
+
+LD R7, AR7
+RET
+AR0 .BLKW #1
+AR1 .BLKW #1
+AR2 .BLKW #1
+AR3 .BLKW #1
+AR4 .BLKW #1
+AR5 .BLKW #1
+AR6 .BLKW #1
+AR7 .BLKW #1
+IS_PALI .FILL #1
+NOT_PALI .FILL #0
+
+.ORIG x4000
+PTR1 .BLKW #1000
+
+

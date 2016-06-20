@@ -1,0 +1,27 @@
+;=================================================
+; Name: Valerie Chiou
+; Username: vchio00
+; 
+; Lab: lab 4
+; Lab section: 21
+; TA: Bryan Marsh
+; 
+;=================================================
+.orig x3000
+
+;---------------
+; INSTRUCTIONS
+;---------------
+
+LD R0, ZERO
+LD R1, ADDRESS
+LD R2, COUNT
+LD R3, HEX_x30
+
+INCREMENT
+	STR R0, R1, #0		; Get value in curr position
+	ADD R1, R1, #1		; Increase position
+	ADD R0, R0, #1		; Increase value
+	ADD R2, R2, #-1		; Decrease count
+	BRp INCREMENT
+LD R1, ADDRESS
